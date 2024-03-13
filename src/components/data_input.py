@@ -8,6 +8,9 @@ from sklearn.model_selection import train_test_split
 from src.exception import FileOperationError
 from src.log_config import logging
 
+# Import after data transformation 
+from src.components.data_transformation import DataTransformationConfig
+from src.components.data_transformation import DataTransformation
 
 
 # Define a dataclass that will hold data ingestion configuration
@@ -15,9 +18,6 @@ from src.log_config import logging
 
 @dataclass
 class DataIngestionConfig:
-    """
-    DataConfig is a container for holding configuration data such as file path for training, testing, and raw data
-    """
     # Define the default file path for train, test and raw data 
     # We indicate that training data will be stored in a folder named 'data_repository' and file name will be train.csv
     train_data_path:str = os.path.join ("data_repository", "train.csv")
@@ -28,7 +28,7 @@ class DataIngestionConfig:
 
 
 # Define a dataclass for data input. This will perform the actual data importation
-class DataImportation:
+class DataIngestion:
     # Create a constructor to initialize the data importation object 
     def __init__(self, config: DataIngestionConfig):
         # Create an instance of the DataImportationConfig to store configuration 
@@ -42,7 +42,7 @@ class DataImportation:
         logging.info("Entered the data importation")
         try:
             # Read the dataset as a DataFrame
-            df = pd.read_csv(r'notebook\data\Home Electricity Consumption.csv')
+            df = pd.read_csv(r'E:\MLproject\powergauge\notebook\data\Homestead Electricity Consumption.csv')
             # Log message to indicate successful reading of the dataframe 
             logging.info("Successfully read the dataframe")
 
@@ -78,13 +78,21 @@ class DataImportation:
             # Raise the exception
             raise FileOperationError(e, sys)
         
-if __name__ == "__main__":
+# if __name__ == "__main__":
+#      config = DataIngestionConfig()
+#      obj=DataIngestion(config)
+#      obj.initiate_data_importation()
+
+# After data transformation and utils 
+
+#We have combined data transformation and data ingestion
+#when the script is run directly, it performs data ingestion and transformation operations 
+if __name__=="__main__":
     config = DataIngestionConfig()
-    obj=DataImportation(config)
-    obj.initiate_data_importation()
+    obj = DataIngestion(config) # creates an instance of the DataIngestion class, which is responsible for data ingestion operations.
+    train_data, test_data =  obj.initiate_data_importation() # This line calls the initiate_data_ingestion() method of the DataIngestion.
 
+    data_transformation = DataTransformation() # Creates an instance of the DataTransformation class, responsible for data transformation operations.
+    data_transformation.initiate_data_transformation(train_data, test_data) # This method initiates the data transformation process
 
-
-
-    
 
